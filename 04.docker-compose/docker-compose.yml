@@ -1,0 +1,41 @@
+version: '3'
+services:
+  webapp:
+    container_name: webapp
+    build:
+      context: ./
+      dockerfile: Dockerfile
+    volumes:
+      - "./:/webapp"
+    depends_on:
+      - mysql
+    restart: always
+    networks:
+      example-net:
+
+  nginx:
+    container_name: nginx
+    image: nginx
+    volumes:
+      - "./:/webapp"
+      - "./docker/nginx.conf:/etc/nginx/conf.d/default.conf"
+    ports:
+      - 80:80
+    depends_on:
+      - "webapp"
+    restart: always
+    networks:
+      example-net:
+
+  mysql:
+    container_name: db-server
+    image: percona
+    restart: always
+    environment:
+      MYSQL_ROOT_PASSWORD: root
+    networks:
+      example-net:
+
+networks:
+  example-net:
+    driver: bridge
