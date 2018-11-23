@@ -1,0 +1,7 @@
+---
+
+default_server_ip: ~
+db_server_ip: ~
+
+host:
+  default_etc_hosts:

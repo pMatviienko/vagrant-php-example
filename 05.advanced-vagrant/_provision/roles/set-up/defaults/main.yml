@@ -1,0 +1,8 @@
+---
+
+project:
+  initial_commands:
+    - directory: /vagrnt/
+      shell: composer config --global process-timeout 1000
+    - directory: /vagrant/
+      shell: composer install --prefer-dist

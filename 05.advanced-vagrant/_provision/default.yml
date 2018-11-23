@@ -1,0 +1,71 @@
+---
+
+-
+  hosts: all
+
+  any_errors_fatal: true
+
+  pre_tasks:
+    - debug: var=ansible_user
+
+    - name: Add ssh identity.
+      shell: ssh-add
+      run_once: true
+      delegate_to: 127.0.0.1
+
+    - name: Register host machine ip address.
+      shell: route -n | grep "^0.0.0.0" | grep -oP "[\d{1,3}.\d{1,3}.\d{1,3}.\d{1,3}]\d{1,3}.\d{1,3}.\d{1,3}.\d{1,3}"
+      register: host_ip
+      become: true
+
+    - set_fact:
+        host_ip: "{{ host_ip.stdout }}"
+
+    - debug: var=ansible_default_ipv4.address
+
+  roles:
+    - common
+    - docker
+    - containers
+    - php72
+    - host
+    - set-up
+  vars:
+    default_server_ip: 192.168.57.37
+    docker_users: ["vagrant"]
+    mysql:
+      vhost: percona.myapp.int
+      password: qwerty
+    host:
+      default_etc_hosts:
+        - myapp.int
+        - percona.myapp.int
+    project:
+      initial_commands:
+        - directory: /vagrant/
+          shell: composer config --global process-timeout 1000
+        - directory: /vagrant/
+          shell: composer install --prefer-dist
+        - directory: /vagrant/
+          shell: php ./bin/console doctrine:database:create --if-not-exists
+#        - directory: /vagrant/
+#          shell: php ./bin/console doctrine:migrations:migrate --no-interaction
+    common:
+      apt_pkgs:
+        - htop
+        - nmon
+        - ncdu
+        - zip
+        - git-core
+        - git
+        - mc
+        - libgmp10
+        - unzip
+        - pax
+        - sysstat
+        - sqlite3
+        - wget
+        - nginx
+        - unzip
+      pip_packages:
+        - docker

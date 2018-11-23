@@ -1,0 +1,13 @@
+---
+
+- import_tasks: nginx.yml
+- import_tasks: fpm.yml
+
+- name: Set host machine hosts entries for default box.
+  lineinfile:
+    dest: "/etc/hosts"
+    line: "{{ default_server_ip }} {{ item }}"
+  with_items: "{{ host.default_etc_hosts }}"
+  run_once: true
+  delegate_to: 127.0.0.1
+  become: true

@@ -1,0 +1,7 @@
+---
+
+- name: Set Up| Run initial shell commands
+  shell: "{{item.shell}}"
+  args:
+    chdir: "{{item.directory}}"
+  with_items: "{{project.initial_commands}}"

@@ -1,0 +1,36 @@
+---
+
+- name: NGINX - Check default config
+  stat: path=/etc/nginx/sites-enabled/default
+  register: nginx_default_config
+  become: true
+
+- name: NGINX - Disable Default nginx site
+  file: >
+    path=/etc/nginx/sites-enabled/default
+    state=absent
+  when: nginx_default_config.stat.exists == true
+  notify: restart_nginx
+  become: true
+
+- name: NGINX - Check previously added config
+  stat: path=/etc/nginx/sites-enabled/nginx-site.conf
+  register: nginx_config
+  become: true
+
+- name: NGINX - Disable Previously set config
+  file: >
+    path=/etc/nginx/sites-enabled/nginx.conf
+    state=absent
+  when: nginx_config.stat.exists == true
+  notify: restart_nginx
+  become: true
+
+- name: NGINX - Copy nginx config
+  copy: >
+    src='nginx.conf'
+    dest=/etc/nginx/sites-enabled
+    owner=root
+    group=root
+  become: true
+  notify: restart_nginx

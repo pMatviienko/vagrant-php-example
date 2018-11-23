@@ -1,0 +1,21 @@
+---
+
+common:
+  apt_pkgs:
+    - htop
+    - nmon
+    - ncdu
+    - zip
+    - git-core
+    - git
+    - mc
+    - libgmp10
+    - unzip
+    - pax
+    - sysstat
+    - sqlite3
+    - wget
+    - nginx
+    - unzip
+  pip_packages:
+    - docker

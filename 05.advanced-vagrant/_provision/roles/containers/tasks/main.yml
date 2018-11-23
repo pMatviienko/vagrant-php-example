@@ -1,0 +1,28 @@
+---
+
+- name: CONTAINERS | Create directories
+  file: path="{{ item }}" state=directory mode="u=rwX,g=rwX,o=rwX"
+  with_items:
+      - /opt/container/mysql/lib
+      - /opt/container/mysql/log
+      - /opt/container/mysql/conf
+  become: true
+
+- name: CONTAINERS | Set up mysql container
+  docker_container:
+      name: "{{ mysql.vhost }}"
+      hostname: "{{ mysql.vhost }}"
+      image: percona
+      state: started
+      pull: true
+      restart_policy: always
+      ports:
+          - "3306:3306"
+      volumes:
+          - /opt/container/mysql/lib:/var/lib/mysql
+          - /opt/container/mysql/log:/var/log/mysql
+          - /opt/container/mysql/conf:/etc/mysql/conf.d
+      command: --character-set-server=utf8 --collation-server=utf8_unicode_ci
+      env:
+          MYSQL_ROOT_PASSWORD: "{{ mysql.password }}"
+  become: true

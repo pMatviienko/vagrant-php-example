@@ -1,0 +1,32 @@
+---
+- name: Adding PHP repository
+  apt_repository: >
+    repo=ppa:ondrej/php
+    state=present
+    update_cache=true
+  become: true
+
+- name: Install php packages
+  apt:
+    pkg: "{{ item }}"
+    state: latest
+    force: true
+  with_items: "{{ php.packages }}"
+  become: true
+
+- name: Copy Cli configuration
+  template:
+    src: "cli.php.ini"
+    dest: "/etc/php/7.2/cli/conf.d/php.ini"
+  become: true
+
+- name: Copy Fpm configuration
+  template:
+    src: "fpm.php.ini"
+    dest: "/etc/php/7.2/fpm/conf.d/php.ini"
+  notify: restart_php_fpm
+  become: true
+
+- name: Installing composer
+  raw: curl -sS https://getcomposer.org/installer | sudo php -- --install-dir=/usr/local/bin --filename=composer
+  become: true

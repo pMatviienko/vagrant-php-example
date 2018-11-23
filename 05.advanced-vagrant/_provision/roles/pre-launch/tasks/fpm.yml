@@ -1,0 +1,36 @@
+---
+
+- name: FPM - Check for default config
+  stat: path=/etc/php/7.2/fpm/pool.d/www.conf
+  register: fpm_default_config
+  become: true
+
+- name: FPM - Ensure default config is disabled
+  file: >
+    path=/etc/php/7.2/fpm/pool.d/www.conf
+    state=absent
+  when: fpm_default_config.stat.exists == true
+  notify: restart_php_fpm
+  become: true
+
+- name: FPM - Check for previous config
+  stat: path=/etc/php/7.2/fpm/pool.d/fpm-pool.conf
+  register: fpm_previous_config
+  become: true
+
+- name: FPM - Disable previously created config
+  file: >
+    path=/etc/php/7.2/fpm/pool.d/fpm-pool.conf
+    state=absent
+  when: fpm_previous_config.stat.exists == true
+  notify: restart_php_fpm
+  become: true
+
+- name: FPM - Copy fpm config
+  copy: >
+    src='fpm-pool.conf'
+    dest=/etc/php/7.2/fpm/pool.d/
+    owner=root
+    group=root
+  become: true
+  notify: restart_php_fpm
